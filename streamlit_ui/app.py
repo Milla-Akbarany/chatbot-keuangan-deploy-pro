@@ -327,21 +327,29 @@ def show_dashboard():
         params={"period_type": period_type, "period_value": period_value},
         token=st.session_state.token,
     )
+    if "error" in summary:
+        st.error(f"Gagal mengambil ringkasan: {summary['error']}")
+        return
 
-    # ── Ambil data list transaksi (untuk kategori & jumlah) ────────────────
+    total_debit = summary.get("total_debit", 0)
+    total_kredit = summary.get("total_kredit", 0)
+    saldo = summary.get("saldo_bersih", 0)
+
+    # ── Ambil data list transaksi ───────────────────────────────────────────
     txn_data = api_get(
         "/transactions/list",
         params={"period_type": period_type, "period_value": period_value, "limit": 500},
         token=st.session_state.token,
     )
-    items = txn_data.get("items", [])
+    if "error" in txn_data:
+        st.error(f"Gagal mengambil daftar transaksi: {txn_data['error']}")
+        items = []
+    else:
+        items = txn_data.get("items", [])
 
-    # ── 1. KPI Cards ─────────────────────────────────────────────────────────
-    total_debit = summary.get("total_debit", 0)
-    total_kredit = summary.get("total_kredit", 0)
-    saldo = summary.get("saldo_bersih", 0)
     jumlah_transaksi = len(items)
 
+    # ── 1. KPI Cards ─────────────────────────────────────────────────────────
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("💰 Total Pemasukan", fmt_rp(total_debit))
     col2.metric("💸 Total Pengeluaran", fmt_rp(total_kredit))
@@ -369,15 +377,15 @@ def show_dashboard():
             params={"period_type": "month", "period_value": pv},
             token=st.session_state.token,
         )
-        label = f"{m:02d}/{y}"
-        trend_rows.append({
-            "Bulan": label,
-            "Pemasukan": round(d.get("total_debit", 0), 0),
-            "Pengeluaran": round(d.get("total_kredit", 0), 0),
-        })
+        if "error" not in d:
+            trend_rows.append({
+                "Bulan": f"{m:02d}/{y}",
+                "Pemasukan": round(d.get("total_debit", 0), 0),
+                "Pengeluaran": round(d.get("total_kredit", 0), 0),
+            })
 
-    df_trend = pd.DataFrame(trend_rows).set_index("Bulan")
-    if df_trend.sum().sum() > 0:
+    if trend_rows:
+        df_trend = pd.DataFrame(trend_rows).set_index("Bulan")
         st.line_chart(df_trend)
     else:
         st.info("Belum ada data transaksi 6 bulan terakhir.")
@@ -390,7 +398,7 @@ def show_dashboard():
     with col_left:
         st.subheader(f"🏷️ Pengeluaran per Kategori ({period_label})")
         if items:
-            cat_kredit: dict = {}
+            cat_kredit = {}
             for item in items:
                 kredit = float(item.get("kredit", 0) or 0)
                 if kredit > 0:
@@ -411,7 +419,7 @@ def show_dashboard():
     with col_right:
         st.subheader(f"💰 Pemasukan per Kategori ({period_label})")
         if items:
-            cat_debit: dict = {}
+            cat_debit = {}
             for item in items:
                 debit = float(item.get("debit", 0) or 0)
                 if debit > 0:
@@ -447,7 +455,7 @@ def show_dashboard():
     # ── 6. Transaksi Terbaru (5 terakhir) ──────────────────────────────────
     st.subheader(f"📋 Transaksi Terbaru ({period_label})")
     if items:
-        # Ambil 5 transaksi terbaru (asumsi items sudah urut dari API)
+        # Asumsi items sudah diurutkan dari API (terbaru pertama)
         latest = items[:5]
         rows = []
         for item in latest:
@@ -472,7 +480,6 @@ def show_dashboard():
 
     # ── 7. Download CSV ─────────────────────────────────────────────────────
     if items:
-        # Buat dataframe lengkap untuk download
         all_rows = []
         for item in items:
             debit = float(item.get("debit", 0) or 0)
