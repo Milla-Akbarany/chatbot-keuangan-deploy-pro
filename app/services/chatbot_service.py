@@ -18,6 +18,7 @@ import logging
 from datetime import datetime, date
 from typing import Optional
 from dataclasses import dataclass, field
+import traceback
 
 from app.services import embedding_service, qdrant_service, mysql_service, llm_service
 from app.utils.helpers import (
@@ -143,12 +144,19 @@ def process_message(
         })
 
     except Exception as e:
+        print("=" * 80)
+        print("ERROR PROCESS_MESSAGE")
+        traceback.print_exc()
+        print("=" * 80)
+
         logger.error(f"Error in process_message: {e}", exc_info=True)
+
         log_data.update({
             "response_text": "Terjadi kesalahan pada sistem. Silakan coba lagi.",
             "response_type": "system_error",
             "sql_success": False,
         })
+
         result = {
             "response": log_data["response_text"],
             "needs_confirmation": False,
