@@ -20,7 +20,7 @@ import os
 os.environ["STREAMLIT_USE_ARROW"] = "0"
 
 # ── Konfigurasi ───────────────────────────────────────────────────────────────
-API_BASE = "financial-chatbot-backend-production.up.railway.app"
+API_BASE = "https://financial-chatbot-backend-production.up.railway.app"
 
 st.set_page_config(
     page_title="Chatbot Keuangan",
