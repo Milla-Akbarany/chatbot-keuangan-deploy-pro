@@ -47,7 +47,6 @@ def get_client() -> QdrantClient:
 class IntentResult:
     intent_name: str
     confidence: float
-    cosine_similarity: float
     detected_via: str  # "qdrant" | "unknown"
 
 
