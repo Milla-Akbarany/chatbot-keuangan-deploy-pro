@@ -347,8 +347,6 @@ def show_dashboard():
         items = txn_data.get("items", [])
 
     jumlah_transaksi = len(items)
-    st.write("DEBUG jumlah transaksi:", len(items))
-    st.write("DEBUG sample item:", items[:1])
 
     # ── 1. KPI Cards ─────────────────────────────────────────────────────────
     col1, col2, col3, col4 = st.columns(4)
