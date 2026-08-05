@@ -531,9 +531,8 @@ def main():
 
     if menu == "💬 Chat":
         show_chat()
-    else menu == "📊 Dashboard":
+    elif menu == "📊 Dashboard":
         show_dashboard()
-
 
 if __name__ == "__main__":
     main()
