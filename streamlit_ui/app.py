@@ -512,27 +512,29 @@ def main():
     with st.sidebar:
         st.write(f"👤 **{st.session_state.username}**")
         st.divider()
+
         menu = st.radio(
             "Menu",
             ["💬 Chat", "📊 Dashboard"],
             label_visibility="collapsed",
         )
-        st.divider()
-        st.divider()
 
         st.divider()
-        if st.button("🚪 Keluar"):
-            for key in ["token", "username", "messages", "pending_confirm"]:
-                st.session_state[key] = None if key == "token" else (
-                    [] if key == "messages" else False
-                )
+
+        if st.button("🚪 Keluar", use_container_width=True):
+            st.session_state.token = None
             st.session_state.username = None
+            st.session_state.messages = []
+            st.session_state.pending_confirm = False
+            st.session_state.session_id = str(uuid.uuid4())
             st.rerun()
 
+    # Halaman
     if menu == "💬 Chat":
         show_chat()
     elif menu == "📊 Dashboard":
         show_dashboard()
+
 
 if __name__ == "__main__":
     main()
