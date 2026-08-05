@@ -14,7 +14,6 @@ import requests
 import uuid
 import pandas as pd
 from datetime import datetime
-import streamlit.components.v1 as components
 import os
 
 os.environ["STREAMLIT_USE_ARROW"] = "0"
@@ -515,17 +514,12 @@ def main():
         st.divider()
         menu = st.radio(
             "Menu",
-            ["💬 Chat", "📊 Dashboard", "📈 Analitik"],
+            ["💬 Chat", "📊 Dashboard"],
             label_visibility="collapsed",
         )
         st.divider()
         st.divider()
-        st.markdown("📈 **Analitik Lanjutan**")
-        st.link_button(
-            "Buka Dashboard Metabase",
-            "http://localhost:3001/public/dashboard/335db77e-cec0-42ce-a2c5-f4ff5eff12a0",
-            use_container_width=True,
-        )
+
         st.divider()
         if st.button("🚪 Keluar"):
             for key in ["token", "username", "messages", "pending_confirm"]:
@@ -537,15 +531,8 @@ def main():
 
     if menu == "💬 Chat":
         show_chat()
-    elif menu == "📊 Dashboard":
+    else menu == "📊 Dashboard":
         show_dashboard()
-    else:
-        st.title("📈 Analitik Lanjutan")
-        components.iframe(
-            "http://localhost:3001/public/dashboard/335db77e-cec0-42ce-a2c5-f4ff5eff12a0",
-            height=800,
-            scrolling=True,
-        )
 
 
 if __name__ == "__main__":
