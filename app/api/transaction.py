@@ -18,7 +18,7 @@ def list_transactions(
     period_value: Optional[str] = Query(None, description="2025-01 | 2025 | 2025-01-15"),
     jenis_akun: Optional[str] = Query(None),
     sub_kategori: Optional[str] = Query(None),
-    limit: int = Query(50, le=200),
+    limit: int = Query(50, le=500),
     current_user: dict = Depends(get_current_user),
 ):
     rows, _ = get_transactions(
